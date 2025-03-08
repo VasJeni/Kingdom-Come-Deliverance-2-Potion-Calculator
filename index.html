@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kingdom Come Deliverance 2 Potion Calculator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .card-img-top {
+            height: 150px;
+            object-fit: cover;
+        }
+        .ingredient-img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            margin-right: 5px;
+        }
+        .total-ingredients {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .card-img-top {
+            height: 50px;
+            object-fit: contain;
+        }
+        td > img {
+            height: 25px;
+        }
+        #ingredients-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .ingredient-item {
+            text-align: center;
+            width: 120px;
+        }
+        .ingredient-img {
+            width: 30px;
+            height: 30px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="my-4">Potion Calculator</h1>
+        
+        <!-- Загальний інпут для кількості зілля -->
+        <div class="form-group">
+            <label for="totalPotions">Every potion in general:</label>
+            <input type="number" id="totalPotions" class="form-control" value="0" min="0" placeholder="0">
+        </div>
+
+        <!-- Контейнер для карток зілля -->
+        <table id="potionsTable">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>In pocket </th>
+                    <th>Need</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Рядки таблиці додаються через JS -->
+            </tbody>
+        </table>
+
+        <!-- Загальний список необхідних інгредієнтів -->
+        <div id="totalIngredients" class="total-ingredients">
+            <h5 class="text-center">necessary ingredients</h5>
+            <ul id="ingredientsList"></ul>
+        </div>
+
+        <div id="ingredients-list"></div>
+
+        
+    </div>
+
+    <script>
+        const potions = [
+            { name: 'Aesop', link: 'src/img/pot/potion_aesop_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Aqua Vitalis', link: 'src/img/pot/potion_aquavitalis_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Artemisia', link: 'src/img/pot/potion_artemisia_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Bane Poison', link: 'src/img/pot/bane_poison_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Bowman\'s Brew', link: 'src/img/pot/potion_bowmans_brew_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Buck\'s Blood', link: 'src/img/pot/potion_bucksblood_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Chamomile Brew', link: 'src/img/pot/potion_chamomile_decoction_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Cockerel', link: 'src/img/pot/potion_cockerel_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Digestive Potion', link: 'src/img/pot/potion_digestive__icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Dollmaker Poison', link: 'src/img/pot/dollmaker__poison_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Embrocation', link: 'src/img/pot/potion_embrocation_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Fever Tonicum', link: 'src/img/pot/potion_fevertonic_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Fox', link: 'src/img/pot/potion_fox_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Hair o\' the Dog', link: 'src/img/pot/potion_hair_o_dog_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Lethean Water', link: 'src/img/pot/potion_lethean_water_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Lion', link: 'src/img/pot/perfume_lion_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Lullaby Poison', link: 'src/img/pot/lullaby_poison_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Marigold Decoction', link: 'src/img/pot/potion_marigold_decoction_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Mintha', link: 'src/img/pot/perfume_mintha_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Moonshine', link: 'src/img/pot/potion_moonshine_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Nighthawk', link: 'src/img/pot/potion_nighthawk_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Painkiller Brew', link: 'src/img/pot/potion_painkiller_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Quickfinger Potion', link: 'src/img/pot/potion_quickfinger_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Saviour Schnapps', link: 'src/img/pot/potion_saviourschnapps_icon-kcd2-wiki-guide-64px.png' },
+            { name: 'Soap', link: 'src/img/pot/soap_icon-kcd2-wiki-guide-64px.png' }
+        ];
+
+        const ingredients = [
+            { name: "Belladona", link: "src/img/ing/belladona-alchemy-item-kcd2-wiki-guide.png" },
+            { name: "Chamomile", link: "src/img/ing/chamomile-alchemy-item-kcd2-wiki-guide.png" },
+            { name: "Comfrey", link: "src/img/ing/comfrey-alchemy-item-kcd2-wiki-guide.png" },
+            { name: "Dandelion", link: "src/img/ing/dandelion-alchemy-item-kcd2-wiki-guide.png" },
+            { name: "Elderberry Leaves", link: "src/img/ing/elderberry-leaves-alchemy-item-kcd2-wiki-guide.png" },
+            { name: "Eyebright", link: "src/img/ing/eyebright-alchemy-item-kcd2-wiki-guide.png" },
+            { name: "Feverfew", link: "src/img/ing/feverfew-alchemy-item-kcd2-wiki-guide.png" },
+            { name: "Ginger", link: "src/img/ing/ginger-alchemy-item-kcd2-wiki-guide.png" },
+            { name: "Henbane", link: "src/img/ing/henbane-alchemy-item-kcd2-wiki-guide.png" },
+            { name: "Herb Paris", link: "src/img/ing/herb-paris-alchemy-item-kcd2-wiki-guide.png" },
+            { name: "Marigold", link: "src/img/ing/marigold-alchemy-item-kcd2-wiki-guide.png" },
+            { name: "Mint", link: "src/img/ing/mint-alchemy-item-kcd2-wiki-guide.png" },
+            { name: "Nettle", link: "src/img/ing/nettle-alchemy-item-kcd2-wiki-guide.png" },
+            { name: "Poppy", link: "src/img/ing/poppy-alchemy-item-kcd2-wiki-guide.png" },
+            { name: "Sage", link: "src/img/ing/sage-alchemy-item-kcd2-wiki-guide.png" },
+            { name: "St. John's Wort", link: "src/img/ing/st-johns-wort-alchemy-item-kcd2-wiki-guide.png" },
+            { name: "Thistle", link: "src/img/ing/thistle-alchemy-item-kcd2-wiki-guide.png" },
+            { name: "Valerian", link: "src/img/ing/valerian-alchemy-item-kcd2-wiki-guide.png" },
+            { name: "Wormwood", link: "src/img/ing/wormwood-alchemy-item-kcd2-wiki-guide.png" },
+            { name: "Boar's Tusk", link: "src/img/ing/boars-tusk-blacksmithing-item-kcd2-wiki-guide.png" },
+            { name: "Amanita Muscaria", link: "src/img/ing/amanita-muscaria-blacksmithing-item-kcd2-wiki-guide.png" },
+            { name: "Charcoal", link: "src/img/ing/charcoal-blacksmithing-item-kcd2-wiki-guide.png" },
+            { name: "Cobweb", link: "src/img/ing/cobweb-blacksmithing-item-kcd2-wiki-guide.png" }
+        ];
+
+        const recipes = {
+            "Aesop": { recipe: { "Comfrey": 2, "Belladona": 1, "Boar's Tusk": 1 } },
+            "Aqua Vitalis": { recipe: { "Dandelion": 2, "Marigold": 1 } },
+            "Artemisia": { recipe: { "Sage": 1, "Wormwood": 2 } },
+            "Bane Poison": { recipe: { "Belladona": 2, "Wormwood": 1, "Amanita Muscaria": 1 } },
+            "Bowman's Brew": { recipe: { "Eyebright": 2, "St. John's Wort": 1 } },
+            "Buck's Blood": { recipe: { "St. John's Wort": 1, "Comfrey": 1, "Dandelion": 1 } },
+            "Chamomile Brew": { recipe: { "Chamomile": 2, "Sage": 1 } },
+            "Cockerel": { recipe: { "Mint": 2, "Valerian": 1 } },
+            "Digestive Potion": { recipe: { "Thistle": 2, "Mint": 1, "Charcoal": 1 } },
+            "Dollmaker Poison": { recipe: { "Herb Paris": 2, "Valerian": 1 } },
+            "Embrocation": { recipe: { "Poppy": 1, "Valerian": 1, "Eyebright": 1, "Boar's Tusk": 1 } },
+            "Fever Tonicum": { recipe: { "Feverfew": 3, "Ginger": 2, "Elderberry Leaves": 1 } },
+            "Fox": { recipe: { "St. John's Wort": 1, "Nettle": 1, "Charcoal": 1, "Belladona": 1 } },
+            "Hair o' the Dog": { recipe: { "Sage": 1, "St. John's Wort": 1, "Mint": 1 } },
+            "Lethean Water": { recipe: { "Wormwood": 2, "Belladona": 1, "Henbane": 1 } },
+            "Lion": { recipe: { "Sage": 2, "Mint": 2 } },
+            "Lullaby Poison": { recipe: { "Poppy": 1, "Thistle": 1, "Herb Paris": 1 } },
+            "Marigold Decoction": { recipe: { "Nettle": 1, "Marigold": 2 } },
+            "Mintha": { recipe: { "Dandelion": 3, "Mint": 1, "Marigold": 1 } },
+            "Moonshine": { recipe: { "Wormwood": 2, "Mint": 2 } },
+            "Nighthawk": { recipe: { "Eyebright": 2, "Belladona": 1, "Chamomile": 1 } },
+            "Painkiller Brew": { recipe: { "Poppy": 3, "Marigold": 1, "Comfrey": 1 } },
+            "Quickfinger Potion": { recipe: { "Cobweb": 1, "Eyebright": 2, "Valerian": 2 } },
+            "Saviour Schnapps": { recipe: { "Nettle": 1, "Belladona": 2 } },
+            "Soap": { recipe: { "Thistle": 2, "Dandelion": 1, "Charcoal": 1 } }
+        };
+
+        const potionsContainer = document.getElementById("potionsTable").querySelector("tbody");
+        const totalPotionsInput = document.getElementById("totalPotions");
+        const ingredientsList = document.getElementById("ingredients-list");
+
+        // Функція для створення таблиці
+        function createPotionTable() {
+            potions.forEach(potion => {
+                const row = document.createElement("tr");
+
+                // Зображення
+                const imgCell = document.createElement("td");
+                const img = document.createElement("img");
+                img.src = potion.link;
+                img.alt = potion.name;
+                imgCell.appendChild(img);
+
+                // Назва
+                const nameCell = document.createElement("td");
+                nameCell.textContent = potion.name;
+
+                // Наявна кількість
+                const availableCell = document.createElement("td");
+                const availableInput = document.createElement("input");
+                availableInput.type = "number";
+                availableInput.min = 0;
+                availableInput.value = 0;
+                availableInput.id = potion.name;
+                availableCell.appendChild(availableInput);
+
+                // Не вистачає
+                const missingCell = document.createElement("td");
+                missingCell.textContent = 0;
+
+                row.appendChild(imgCell);
+                row.appendChild(nameCell);
+                row.appendChild(availableCell);
+                row.appendChild(missingCell);
+
+                potionsContainer.appendChild(row);
+            });
+        }
+
+        // Функція для оновлення необхідних інгредієнтів
+        function updateIngredients() {
+            const potionsData = {};
+            document.querySelectorAll("#potionsTable tbody tr").forEach(row => {
+                const name = row.children[1].textContent.trim();
+                const missing = Number(row.children[3].textContent.trim());
+                potionsData[name] = missing;
+            });
+
+            const ingredientsNeeded = {};
+            for (const potion in potionsData) {
+                const quantity = potionsData[potion];
+                const recipe = recipes[potion]?.recipe;
+
+                if (recipe) {
+                    for (const ingredient in recipe) {
+                        const amount = recipe[ingredient] * quantity;
+                        ingredientsNeeded[ingredient] = (ingredientsNeeded[ingredient] || 0) + amount;
+                    }
+                }
+            }
+
+            displayIngredients(ingredientsNeeded);
+        }
+
+        // Функція для відображення інгредієнтів
+        function displayIngredients(ingredientsNeeded) {
+            ingredientsList.innerHTML = "";
+            for (const ingredient in ingredientsNeeded) {
+                const amount = ingredientsNeeded[ingredient];
+                const ingredientObj = ingredients.find(item => item.name === ingredient);
+                const imgSrc = ingredientObj ? ingredientObj.link : "src/img/placeholder.png";
+
+                const item = document.createElement("div");
+                item.classList.add("ingredient-item");
+                item.innerHTML = `
+                    <img src="${imgSrc}" alt="${ingredient}" class="ingredient-img">
+                    <p>${ingredient}: <strong>${amount}</strong></p>
+                `;
+                ingredientsList.appendChild(item);
+            }
+        }
+
+        // Обробник подій для оновлення таблиці та інгредієнтів
+        function handleInputChange() {
+            const totalPotions = Number(totalPotionsInput.value);
+
+            document.querySelectorAll("#potionsTable tbody tr").forEach(row => {
+                const availableInput = row.querySelector("input");
+                const missingCell = row.children[3];
+                const available = Number(availableInput.value);
+
+                const missing = Math.max(0, totalPotions - available);
+                missingCell.textContent = missing;
+            });
+
+            updateIngredients();
+        }
+
+        // Ініціалізація
+        createPotionTable();
+        totalPotionsInput.addEventListener("input", handleInputChange);
+
+        // Додаємо обробник подій для всіх інпутів "В наявності"
+        document.querySelectorAll("#potionsTable tbody input").forEach(input => {
+            input.addEventListener("input", handleInputChange);
+        });
+
+        // Початкове оновлення
+        handleInputChange();
+    </script>
+</body>
+</html>
